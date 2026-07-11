@@ -1,61 +1,96 @@
 # 📋 Smart Attendance Monitoring System — n8n Automation
 
-Automated attendance tracking system using Google Forms, Google Sheets, n8n, JavaScript, and Telegram Bot notifications.
+![n8n](https://img.shields.io/badge/n8n-Automation-orange)
+![Google Sheets](https://img.shields.io/badge/Database-Google%20Sheets-green)
+![Telegram](https://img.shields.io/badge/Notifications-Telegram-blue)
+![JavaScript](https://img.shields.io/badge/Code-JavaScript-yellow)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+An automated attendance monitoring system built using **n8n**, **Google Forms**, **Google Sheets**, **JavaScript**, and **Telegram Bot API**.
+
+This workflow automatically collects attendance submissions, processes attendance records, determines Present/Late status using JavaScript logic, stores attendance data, sends real-time Telegram notifications, and generates automated daily attendance reports.
 
 **Stack:**  
-Google Forms · Google Sheets · n8n · Telegram Bot · JavaScript · Google Workspace API
+n8n · Google Forms · Google Sheets · Telegram Bot API · JavaScript · Google Workspace API · Automation Workflow
 
 
 ---
 
 # 🎯 Project Overview
 
+
 ## Problem
 
-Traditional attendance monitoring requires manual checking, encoding, and reporting, which can lead to:
+Traditional attendance monitoring requires manual checking, encoding, and reporting.
 
-- Human errors
-- Delayed attendance records
-- Difficult report generation
+Common challenges include:
+
+- Manual attendance recording
+- Human errors during data entry
+- Delayed attendance reports
+- Difficulty tracking attendance patterns
 - Lack of real-time monitoring
 
 
+For schools and organizations, managing daily attendance efficiently can become time-consuming.
+
+
+---
+
 ## Solution
 
-This project automates the complete attendance workflow:
+This project creates an automated attendance management system by:
 
-1. Students/employees submit attendance through Google Forms
-2. Responses are stored automatically in Google Sheets
-3. n8n processes attendance data
-4. JavaScript determines Present/Late status
-5. Records are stored in an attendance database sheet
-6. Telegram sends real-time notifications
-7. Daily attendance summaries are generated automatically
+
+1. Collecting attendance through Google Forms
+2. Recording responses in Google Sheets
+3. Detecting new attendance entries using n8n
+4. Processing attendance data automatically
+5. Determining Present/Late status
+6. Saving structured attendance records
+7. Sending Telegram notifications
+8. Generating daily attendance summaries
+
+
+The workflow acts as a digital attendance assistant that eliminates repetitive manual tasks and provides real-time monitoring.
 
 
 ---
 
 # ✨ Features
 
-## Core Features
+
+## Attendance Processing
 
 ✅ Google Forms attendance submission  
 ✅ Automatic Google Sheets data collection  
-✅ Real-time n8n workflow processing  
-✅ Automatic Present/Late detection  
-✅ Telegram attendance notifications  
-✅ Daily attendance reports  
-✅ Automated data organization  
+✅ Real-time attendance processing  
+✅ Present/Late detection  
+✅ Structured attendance database  
 
 
-## Automation Features
+## Automation
 
-✅ Trigger-based workflow  
+✅ Event-driven workflow  
 ✅ JavaScript data processing  
-✅ Conditional branching  
-✅ Scheduled reports  
-✅ API integration  
-✅ Cloud-based workflow automation
+✅ Conditional workflow logic  
+✅ Scheduled attendance reports  
+✅ Automated notifications  
+
+
+## Reporting
+
+✅ Daily attendance summaries  
+✅ Present/Late statistics  
+✅ Telegram report delivery  
+✅ Attendance history tracking  
+
+
+## Integration
+
+✅ Google Workspace integration  
+✅ Telegram Bot notifications  
+✅ n8n workflow automation  
 
 
 ---
@@ -67,15 +102,16 @@ This project automates the complete attendance workflow:
 flowchart TD
 
 A["👤 Student / Employee"]
---> B["📝 Google Form"]
 
-B --> C["📊 Google Sheets"]
+--> B["📝 Google Forms"]
 
-C --> D["⚙️ n8n Automation"]
+--> C["📊 Google Sheets"]
 
-D --> E["🕒 Timestamp Processing"]
+--> D["⚙️ n8n Automation"]
 
-E --> F{"Attendance Time Check"}
+--> E["🕒 Timestamp Processing"]
+
+--> F{"Attendance Time Check"}
 
 F -->|Before 8:00 AM| G["✅ Present"]
 
@@ -88,54 +124,76 @@ H --> I
 I --> J["📱 Telegram Notification"]
 
 
-K["⏰ Daily Scheduler 5PM"]
---> L["📊 Generate Attendance Summary"]
+K["⏰ Schedule Trigger 5PM"]
 
-L --> M["📱 Telegram Daily Report"]
+--> L["📊 Generate Daily Summary"]
+
+--> M["📱 Telegram Report"]
 ````
 
 ---
 
-# 🏗️ Project Workflow
+# 🏗️ Workflow Implementation
 
-## Workflow 1: Real-Time Attendance Monitoring
+# Workflow 1: Real-Time Attendance Monitoring
 
-### Node 1 — Google Sheets Trigger
+## Node 1 — Google Sheets Trigger
 
-**Purpose:**
+### Purpose
 
-Detect new attendance submissions.
+Detect new attendance submissions from Google Forms responses.
 
 Configuration:
 
-```
+```text
 Trigger:
+
 Google Sheets Trigger
 
+
 Event:
+
 Row Added
 
+
 Polling:
-Every 1 minute
+
+Every Minute
 ```
+
+Captured Information:
+
+| Field           | Description         |
+| --------------- | ------------------- |
+| Timestamp       | Attendance time     |
+| Full Name       | User identity       |
+| Student ID      | Identification      |
+| Department      | Organization/class  |
+| Attendance Type | Attendance category |
 
 ---
 
 # Node 2 — Data Extraction
 
-**Purpose:**
+### Purpose
 
-Clean and map Google Form responses.
+Clean and standardize incoming attendance data before processing.
 
-Input:
+Input Example:
 
 ```json
 {
-"Full Name":"",
-"Student ID":"",
-"Department":"",
-"Attendance Type":"",
-"Timestamp":""
+"Full Name":
+"John Smith",
+
+"Student ID":
+"20260001",
+
+"Department":
+"BSIT",
+
+"Timestamp":
+"2026-07-11 07:45:00"
 }
 ```
 
@@ -143,11 +201,17 @@ Output:
 
 ```json
 {
-"Name":"",
-"StudentID":"",
-"Department":"",
-"Type":"",
-"RawTimestamp":""
+"Name":
+"John Smith",
+
+"StudentID":
+"20260001",
+
+"Department":
+"BSIT",
+
+"RawTimestamp":
+"2026-07-11 07:45:00"
 }
 ```
 
@@ -155,75 +219,83 @@ Output:
 
 # Node 3 — JavaScript Attendance Logic
 
-**Purpose:**
+### Purpose
 
-Determine attendance status automatically.
+Automatically determine attendance status based on submission time.
 
 Logic:
 
-```
+```text
 Before 8:00 AM
+
 =
+
 Present
 
 
 After 8:00 AM
+
 =
+
 Late
 ```
 
-Code:
+Processing:
 
 ```javascript
-const items = $input.all();
-
-const results = [];
-
-for (const item of items) {
-
 const timestamp = new Date(
 item.json.RawTimestamp
 );
 
-
 const hour = timestamp.getHours();
 const minute = timestamp.getMinutes();
-
 
 const late =
 hour > 8 ||
 (hour === 8 && minute > 0);
 
+return {
 
-results.push({
-
-json:{
+json: {
 
 ...item.json,
 
 Status:
-late ? "Late":"Present",
+late ? "Late" : "Present",
 
 ProcessedAt:
 new Date().toISOString()
 
 }
 
-});
+};
+```
 
+Output:
+
+```json
+{
+"Status":
+"Present",
+
+"ProcessedAt":
+"2026-07-11T00:45:00Z"
 }
-
-return results;
 ```
 
 ---
 
 # Node 4 — Save Attendance Record
 
+### Purpose
+
+Store processed attendance information into the attendance database.
+
 Google Sheets:
 
-```
+```text
 Sheet:
+
 Attendance Log
 ```
 
@@ -241,9 +313,11 @@ Data Mapping:
 
 ---
 
-# Node 5 — Attendance Status Branch
+# Node 5 — IF Node (Attendance Status Branch)
 
-IF Node:
+### Purpose
+
+Separate attendance notifications based on status.
 
 Condition:
 
@@ -253,17 +327,19 @@ Condition:
 
 Branches:
 
-```
+```text
 Present
-   |
-   |
-Telegram Notification
+
+↓
+
+Attendance Confirmation
 
 
 Late
-   |
-   |
-Telegram Warning
+
+↓
+
+Late Attendance Warning
 ```
 
 ---
@@ -272,23 +348,32 @@ Telegram Warning
 
 Telegram Message:
 
-```
+```text
 ✅ Attendance Recorded
 
 
 👤 Name:
+
 {{Name}}
 
+
 🎓 Student ID:
+
 {{StudentID}}
 
+
 🏫 Department:
+
 {{Department}}
 
+
 🕒 Time:
+
 {{FormattedTime}}
 
+
 📌 Status:
+
 Present
 ```
 
@@ -298,20 +383,27 @@ Present
 
 Telegram Message:
 
-```
+```text
 ⚠️ Late Attendance Recorded
 
 
 👤 Name:
+
 {{Name}}
 
+
 🎓 Student ID:
+
 {{StudentID}}
 
+
 🕒 Time:
+
 {{FormattedTime}}
 
+
 📌 Status:
+
 Late
 ```
 
@@ -319,53 +411,65 @@ Late
 
 # Workflow 2: Daily Attendance Summary
 
-## Schedule Trigger
+## Node 1 — Schedule Trigger
+
+### Purpose
+
+Automatically generate attendance reports at the end of the day.
 
 Configuration:
 
-```
-Type:
+```text
+Trigger:
+
 Schedule Trigger
 
 
 Time:
+
 5:00 PM
 
 
 Timezone:
+
 Asia/Manila
 ```
 
 ---
 
-## Generate Report
+## Node 2 — Generate Attendance Report
 
 The workflow:
 
 1. Reads attendance records
 2. Counts Present users
 3. Counts Late users
-4. Creates daily report
-5. Sends Telegram summary
+4. Creates daily summary
+5. Sends Telegram report
 
 Example Output:
 
-```
+```text
 📊 Daily Attendance Summary
 
+
 📅 Date:
+
 July 11, 2026
 
 
 ✅ Present:
+
 45
 
 
 ⚠️ Late:
+
 5
 
 
 📌 Total:
+
 50
 ```
 
@@ -375,13 +479,13 @@ July 11, 2026
 
 ## Sheet 1: Form Responses
 
-| Column          | Description |
-| --------------- | ----------- |
-| Timestamp       | Automatic   |
-| Full Name       | User input  |
-| Student ID      | User input  |
-| Department      | User input  |
-| Attendance Type | User input  |
+| Column          | Description               |
+| --------------- | ------------------------- |
+| Timestamp       | Automatic submission time |
+| Full Name       | User input                |
+| Student ID      | User input                |
+| Department      | User input                |
+| Attendance Type | User input                |
 
 ---
 
@@ -412,11 +516,11 @@ July 11, 2026
 
 # 🔐 Credentials Required
 
-| Service       | Purpose              |
-| ------------- | -------------------- |
-| Google OAuth2 | Google Sheets access |
-| Telegram API  | Notifications        |
-| n8n Instance  | Workflow execution   |
+| Service          | Purpose              |
+| ---------------- | -------------------- |
+| Google OAuth2    | Google Sheets access |
+| Telegram Bot API | Notifications        |
+| n8n Instance     | Workflow execution   |
 
 ---
 
@@ -424,12 +528,17 @@ July 11, 2026
 
 ## 1. Create Google Form
 
-Required fields:
+Required Fields:
 
-* Full Name
-* Student ID
-* Department
-* Attendance Type
+```text
+Full Name
+
+Student ID
+
+Department
+
+Attendance Type
+```
 
 Connect responses to Google Sheets.
 
@@ -441,18 +550,18 @@ Steps:
 
 1. Open Telegram
 2. Search BotFather
-3. Create bot
+3. Create a bot
 4. Copy API token
-5. Add bot to group
-6. Retrieve Chat ID
+5. Add Telegram credentials in n8n
+6. Configure Chat ID
 
 ---
 
-## 3. Configure n8n
+## 3. Configure n8n Workflow
 
-Import workflow:
+Import:
 
-```
+```text
 Smart-Attendance-Monitoring.json
 ```
 
@@ -468,26 +577,68 @@ Activate workflow.
 
 # 🧪 Testing Checklist
 
-| Test                  | Expected Result        |
-| --------------------- | ---------------------- |
-| Submit before 8 AM    | Present                |
-| Submit after 8 AM     | Late                   |
-| New sheet row created | Workflow triggers      |
-| Telegram message sent | Success                |
-| 5 PM scheduler runs   | Daily report generated |
+| Test Case              | Expected Result       |
+| ---------------------- | --------------------- |
+| Submit before 8 AM     | Present status        |
+| Submit after 8 AM      | Late status           |
+| New sheet row added    | Workflow starts       |
+| JavaScript executes    | Status generated      |
+| Telegram sends message | Notification received |
+| 5 PM scheduler runs    | Daily report created  |
+
+---
+
+# 📁 Repository Structure
+
+```text
+Smart-Attendance-Monitoring-System/
+
+│
+├── README.md
+│
+├── workflow.json
+│
+├── screenshots/
+│   │
+│   ├── workflow.png
+│   ├── google-form.png
+│   ├── google-sheets.png
+│   ├── javascript-node.png
+│   ├── attendance-status.png
+│   ├── telegram-notification.png
+│   └── workflow-execution.png
+│
+└── LICENSE
+```
+
+---
+
+# 📸 Screenshots
+
+Recommended screenshots:
+
+* Complete workflow
+* Google Form attendance submission
+* Google Sheets responses
+* JavaScript attendance processing
+* Present/Late classification
+* Telegram notification
+* Daily summary report
+* Workflow execution
 
 ---
 
 # 🚀 Future Improvements
 
-| Feature            | Implementation            |
-| ------------------ | ------------------------- |
-| QR Attendance      | QR-generated Google Forms |
-| Face Recognition   | Computer Vision API       |
-| GPS Validation     | Location verification     |
-| Dashboard          | Looker Studio             |
-| Weekly Reports     | Scheduled analytics       |
-| Database Migration | PostgreSQL/MySQL          |
+| Feature               | Implementation                |
+| --------------------- | ----------------------------- |
+| QR Attendance         | QR-generated attendance forms |
+| Face Recognition      | Computer Vision API           |
+| GPS Validation        | Location verification         |
+| Dashboard             | Looker Studio analytics       |
+| Weekly Reports        | Scheduled summaries           |
+| Database Migration    | PostgreSQL/MySQL              |
+| Biometric Integration | Hardware attendance devices   |
 
 ---
 
@@ -504,6 +655,7 @@ Activate workflow.
 * JavaScript
 * Data processing
 * Conditional logic
+* JSON transformation
 
 ## APIs
 
@@ -513,30 +665,34 @@ Activate workflow.
 ## Cloud Tools
 
 * Google Workspace
-* n8n Cloud/Self-hosted
+* n8n Self-hosted/Cloud
+
+## Business Automation
+
+* Attendance management
+* Workflow optimization
+* Automated reporting
 
 ---
 
 # 📚 Learning Objectives
 
-Through this project, I learned:
+This project demonstrates:
 
 * Building real-world automation systems
 * Connecting multiple APIs
-* Processing external data
+* Processing external data automatically
 * Creating event-driven workflows
 * Designing scalable automation pipelines
 
 ---
 
-# 📸 Screenshots
+# 🙌 Acknowledgements
 
-Add:
-
-* n8n workflow screenshot
-* Google Form screenshot
-* Google Sheet database
-* Telegram notification screenshot
+* n8n
+* Google Workspace
+* Google Sheets API
+* Telegram Bot API
 
 ---
 
@@ -551,7 +707,7 @@ GitHub:
 
 [https://github.com/belioautomation](https://github.com/belioautomation)
 
-This project is part of my **30-Day n8n Automation Portfolio**, showcasing practical workflow automation using n8n, APIs, JavaScript, and real-world business solutions.
+This project is part of my **30-Day n8n Automation Portfolio**, showcasing practical workflow automation using **n8n, APIs, JavaScript, and real-world business solutions**.
 
 ---
 
@@ -560,6 +716,4 @@ This project is part of my **30-Day n8n Automation Portfolio**, showcasing pract
 MIT License
 
 ```
-
-This format will now match a **professional automation engineer GitHub portfolio style** and can be reused as the template for your remaining 30-day n8n projects.
 ```

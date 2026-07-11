@@ -1,0 +1,381 @@
+{
+  "name": "Smart Attendance Monitoring System",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1P_vxQwEueq83VCEGX1qcNXA3K3LlZ_g9udpMYEUJXbA",
+          "mode": "list",
+          "cachedResultName": "Attendance System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P_vxQwEueq83VCEGX1qcNXA3K3LlZ_g9udpMYEUJXbA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 478147607,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P_vxQwEueq83VCEGX1qcNXA3K3LlZ_g9udpMYEUJXbA/edit#gid=478147607"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "41e8488c-e0b9-4c37-b07d-973b6e56c2e6",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "D0jXxe3kGW9kPweS",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "48e34886-2861-47e1-9f80-dc89537fb7da",
+              "name": "Timestamp",
+              "value": "={{ $json.Timestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "b829713a-a485-4cda-ba93-ba2742b2d088",
+              "name": "Full Name",
+              "value": "={{ $json['Full Name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "5edc00f1-7ba5-4845-a974-33af74ff8233",
+              "name": "Student ID",
+              "value": "={{ $json['Student ID'] }}",
+              "type": "number"
+            },
+            {
+              "id": "10869c7d-de21-4556-87ee-bfb79c8e932e",
+              "name": "Department",
+              "value": "={{ $json.Department }}",
+              "type": "string"
+            },
+            {
+              "id": "1c82d1b0-7cc4-4cb1-bdab-9dac5aa0c7c2",
+              "name": "Attendance Type",
+              "value": "={{ $json['Attendance Type'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "36705b54-451c-462b-a765-111d118e2a8c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n\n  const rawTimestamp = item.json[\"Timestamp\"];\n  const attendanceType = item.json[\"Attendance Type\"];\n\n  // Convert timestamp to Date\n  const date = new Date(rawTimestamp);\n\n  // Extract hour and minute\n  const hours = date.getHours();\n  const minutes = date.getMinutes();\n\n  let cutoffHour;\n  let cutoffMinute;\n\n  // MORNING CUTOFF = 9:00 AM\n  if (attendanceType === \"Morning\") {\n\n    cutoffHour = 9;\n    cutoffMinute = 0;\n\n  }\n\n  // AFTERNOON CUTOFF = 5:00 PM\n  else if (attendanceType === \"Afternoon\") {\n\n    cutoffHour = 17; // 5 PM in 24-hour format\n    cutoffMinute = 0;\n\n  }\n\n  // Default fallback\n  else {\n\n    cutoffHour = 9;\n    cutoffMinute = 0;\n\n  }\n\n  // Determine if late\n  const isLate =\n    hours > cutoffHour ||\n    (hours === cutoffHour && minutes > cutoffMinute);\n\n  const status = isLate ? \"Late\" : \"Present\";\n\n  // Format readable time\n  const formattedTime = date.toLocaleTimeString(\"en-US\", {\n    hour: \"2-digit\",\n    minute: \"2-digit\",\n    hour12: true\n  });\n\n  // Format readable date\n  const formattedDate = date.toLocaleDateString(\"en-US\", {\n    year: \"numeric\",\n    month: \"long\",\n    day: \"numeric\"\n  });\n\n  results.push({\n    json: {\n      ...item.json,\n      Status: status,\n      FormattedTime: formattedTime,\n      FormattedDate: formattedDate,\n      Hour: hours,\n      Minute: minutes\n    }\n  });\n\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "99d9c84c-4fc1-4dfa-9f64-f55f459ee6ca",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1P_vxQwEueq83VCEGX1qcNXA3K3LlZ_g9udpMYEUJXbA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1174578431,
+          "mode": "list",
+          "cachedResultName": "Attendance Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P_vxQwEueq83VCEGX1qcNXA3K3LlZ_g9udpMYEUJXbA/edit#gid=1174578431"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.Timestamp }}",
+            "Full Name": "={{ $json['Full Name'] }}",
+            "Student ID": "={{ $json['Student ID'] }}",
+            "Department": "={{ $json.Department }}",
+            "Status": "={{ $json.Status }}",
+            "Attendance Type": "={{ $json['Attendance Type'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Student ID",
+              "displayName": "Student ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Attendance Type",
+              "displayName": "Attendance Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Processed At",
+              "displayName": "Processed At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        0
+      ],
+      "id": "8fdef74b-beb0-4b00-9f72-c4efd0902379",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qtNupNmEU4VCVfOQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9e9e53d3-60ee-442e-aed3-d2b69be33ea4",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Late",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "aebea146-7397-4581-989f-cd155312e48a",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "1c3e2836-c063-431e-b475-51c8f60adfb6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "-1004142935604",
+        "text": "=✅ Attendance Recorded  \n👤 Name: {{ $json[\"Full Name\"] }} \n🎓 Student ID:{{ $json[\"Student ID\"] }}  \n📌 Status: {{ $json.Status }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        96
+      ],
+      "id": "ac691645-bb9c-4430-8622-b2a757a1df70",
+      "name": "Send a text message",
+      "webhookId": "714b6002-e512-4cd8-a8dd-0f1966f1f6a2",
+      "credentials": {
+        "telegramApi": {
+          "id": "iEqOyi3ASYtaFnIX",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-1004142935604",
+        "text": "=✅ Attendance Recorded   \n👤 Name: {{ $json[\"Full Name\"] }}  \n🎓 Student ID:{{ $json[\"Student ID\"] }}   \n📌 Status: {{ $json.Status }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        -80
+      ],
+      "id": "6df0b522-b8c3-4559-800c-a3a3b374a3bb",
+      "name": "Send a text message1",
+      "webhookId": "929d1a8f-abd0-41d0-98f3-9615ecd0feca",
+      "credentials": {
+        "telegramApi": {
+          "id": "iEqOyi3ASYtaFnIX",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "389c37fa-85bf-4f57-bee1-92160b16b0ae",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8109642ab6846a9cf1618de304921f5663481ec8cdaee6a52dd360d6de75a743"
+  },
+  "id": "wHIDw8tWdY18F5ya",
+  "tags": []
+}
